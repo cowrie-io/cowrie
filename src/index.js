@@ -14,6 +14,13 @@ class Cowrie {
     };
 
     /**
+     * Performs a series of checks
+     */
+    #check(currency, amounnt, precision) {
+
+    }
+
+    /**
      * Create money
      * @param {string} currency
      * @param {number} amount
