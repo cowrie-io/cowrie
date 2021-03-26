@@ -14,6 +14,11 @@ module.exports = {
             },
         ],
     },
+    resolve: {
+        alias: {
+            '@': rootDir + '/src/',
+        },
+    },
     plugins: [
         new CleanWebpackPlugin(),
     ],

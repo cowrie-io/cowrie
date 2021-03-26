@@ -36,9 +36,6 @@
     "contributors": [
         "Dennis Mwangangi <mwangangi@creareafrica.com> (https://github.com/mwangangi)"
     ],
-    "dependencies": {
-        "big.js": "^5.2.2"
-    },
     "devDependencies": {
         "@babel/core": "^7.10.4",
         "@babel/plugin-proposal-class-properties": "^7.10.4",

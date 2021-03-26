@@ -1,138 +1,63 @@
-import Decimal from 'big.js';
+import {SummationError} from '@/errors';
+import {compute, validate} from '@/utils';
 
 /**
- * Money data-type
+ * Cowrie object - a composite data type to represent a given monetary value
  * @type {Cowrie}
  */
 class Cowrie {
-    #amount;
-    #format;
     #currency;
+    #amount;
     #precision;
 
-    #roundingTypes = {
-        ROUND_UP: 3,
-        ROUND_DOWN: 0,
-        ROUND_HALF_UP: 1,
-        ROUND_HALF_EVEN: 2,
-    };
-
     /**
-     * Create money
+     * Creates an instance of the Cowrie object
      *
-     * @param {string} currency - A valid ISO 4217 codes for the currency
-     * @param {number|string} amount - A string or number for the initial value defaults to zero
-     * @param {number} [precision=2] - A positive integer indicating number of decimal places
-     * @param {boolean} [format=true] - A Flag to format figure as currency
+     * @param {object} props - an object that defines the monetary value
+     *
+     * @param {string} props.currency - a valid ISO 4217 codes for the currency e.g USD, KES
+     * @param {number} props.precision - a positive integer indicating number of decimal places
+     * @param {number|string} props.amount - a string or number for the initial value defaults to zero
      */
-    constructor(currency, amount, precision = 2, format = false) {
-        /** @type {string} */
-        this.#currency = currency;
+    constructor(props) {
+        const valid = validate.props(props);
 
-        /** @type {string | number} */
-        this.#amount = parseFloat(amount) || 0;
-
-        /** @type {number} */
-        this.#precision = precision;
-
-        /** @type {boolean} */
-        this.#format = format;
+        this.#currency = valid.currency ? props.currency : 'Cowrie';
+        this.#amount = valid.amount ? props.amount : 0;
+        this.#precision = valid.precision ? props.precision : 2;
     }
 
     /**
-     * Retrieve a formatted amount
      *
-     * @return {string}
      */
-    get figure() {
-        let amt = this.#amount;
-        if (!(amt instanceof Decimal)) {
-            amt = new Decimal(this.#amount);
-        }
+    format() {
 
-        if (this.#format) {
-            let [a, b] = amt.toFixed(this.#precision).split('.');
-            a = a.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-
-            return b !== undefined
-                ? [a, b].join('.')
-                : a;
-        }
-
-        return amt.toFixed(this.#precision);
     }
 
     /**
-     * Add the provided numbers to the current or initial value
+     * Adds a sequence of numbers to the current amount
      *
-     * @param  {...number} x - A positive or negative number
+     * @param  {...number} addends - A sequence of numerical values
+     *
+     * @throws {SummationError}
+     *
      * @return {Cowrie}
      */
-    plus(...x) {
-        const sum = x.reduce((sigma, x) => {
-            return sigma.plus(x);
-        }, new Decimal(this.#amount));
+    plus(...addends) {
+        const summand = validate.integer(this.#amount)
+            ? parseInt(this.#amount)
+            : parseFloat(this.#amount);
 
-        return new Cowrie(this.#currency, sum, this.#precision);
-    }
+        const result = addends.every((x) => validate.integer(x)) && addends.reduce((sum, x) => {
+            return compute.addition(sum, x);
+        }, summand);
 
+        if (result === false) throw SummationError;
 
-    /**
-     * Subtract the provided numbers to the current or initial value
-     *
-     * @param  {...number} x - A positive or negative number
-     * @return {Cowrie}
-     */
-    minus(...x) {
-        const difference = x.reduce((sigma, x) => {
-            return sigma.minus(x);
-        }, new Decimal(this.#amount));
-
-        return new Cowrie(this.#currency, difference, this.#precision);
-    }
-
-    /**
-     * Multiply the current or initial value by a given factor
-     *
-     * @param  {number} x - A positive or negative number
-     * @return {Cowrie}
-     */
-    times(x) {
-        const product = new Decimal(this.#amount).times(x);
-
-        return new Cowrie(this.#currency, product, this.#precision);
-    }
-
-    /**
-     * Divide the current or initial value by a given quotient
-     *
-     * @param  {number} x - A positive or negative number
-     * @return {Cowrie}
-     */
-    divide(x) {
-        const quotient = new Decimal(this.#amount).div(x);
-
-        return new Cowrie(this.#currency, quotient, this.#precision);
-    }
-
-    /**
-     * Split the current amount by the given allocation percentage or ratio
-     *
-     * @param  {Array} ratio - An array representing the fractional allocations e.g ratio of 2:1 => [2, 1]
-     * @return {Array.<Cowrie>}
-     */
-    allocate(ratio) {
-        const commonFactor = new Decimal(100).div(ratio.reduce((a, b) => a + b));
-
-        return ratio.map((x, i) => {
-            const percentage = commonFactor.times(x);
-            const allocation = new Decimal(this.#amount).times(percentage).div(100);
-
-            const amount = i % 2 == 0
-                ? allocation.round(this.#precision, 3)
-                : allocation.round(this.#precision, 0);
-
-            return new Cowrie(this.#currency, amount, this.#precision);
+        return new Cowrie({
+            currency: this.#currency,
+            amount: result,
+            precision: this.#precision,
         });
     }
 }
