@@ -22,6 +22,6 @@ export const SUPPORTED_ROUNDING_MODES = [
  * Regex that formats numbers with comma separator using lookbehind strategy
  */
 export const COMMA_SEPARATOR_REGEX = {
-    LOOKAHEAD_ASSRTIONS: /\B(?=(\d{3})+(?!\d))/g,
+    LOOKAHEAD_ASSERTIONS: /\B(?=(\d{3})+(?!\d))/g,
     NEGATIVE_LOOKBEHIND: /\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g,
 };

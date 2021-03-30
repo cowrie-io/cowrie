@@ -74,7 +74,8 @@ class Cowrie {
             try {
                 output = rounded.toString().replace(COMMA_SEPARATOR_REGEX.NEGATIVE_LOOKBEHIND, ',');
             } catch (error) {
-                output = rounded.toString().replace(COMMA_SEPARATOR_REGEX.LOOKAHEAD_ASSRTIONS, ',');
+                const [whole, fraction] = rounded.toString().split();
+                output = `${whole}.${fraction.replace(COMMA_SEPARATOR_REGEX.LOOKAHEAD_ASSERTIONS, ',')}`;
             }
         }
 
