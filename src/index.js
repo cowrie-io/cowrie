@@ -1,5 +1,6 @@
 import {compute, validate} from '@/utils';
 import {RatioTypeError, SummationTypeError} from '@/errors';
+import {AMOUNT, CURRENCY, PRECISION, COMMA_SEPARATOR_REGEX} from '@/constants';
 
 /**
  * Cowrie object - a composite data type to represent a given monetary value
@@ -22,13 +23,13 @@ class Cowrie {
     constructor(props) {
         const valid = validate.props(props);
 
-        this.#currency = valid.currency ? props.currency : 'Cowrie';
-        this.#amount = valid.amount ? props.amount : 0;
-        this.#precision = valid.precision ? props.precision : 2;
+        this.#amount = valid.amount ? props.amount : AMOUNT;
+        this.#currency = valid.currency ? props.currency : CURRENCY;
+        this.#precision = valid.precision ? props.precision : PRECISION;
     }
 
     /**
-     * Returns the currenct currency code
+     * Returns the current currency
      *
      * @return {String}
      */
@@ -37,16 +38,18 @@ class Cowrie {
     }
 
     /**
-     * Returns the current numerical value
+     * Returns the current amount
      *
-     * @return {String}
+     * @return {Number}
      */
     get amount() {
-        return this.#amount.toString();
+        return validate.float(this.#amount)
+            ? parseFloat(this.#amount)
+            : parseInt(this.#amount);
     }
 
     /**
-     * Returns the currenct precision i.e number of decimal places
+     * Returns the current currency
      *
      * @return {Number}
      */
@@ -55,15 +58,27 @@ class Cowrie {
     }
 
     /**
-     * Rounds off the current amount
+     * Returns a formatted representation of the monetary value
      *
-     * @param {Number} precision - the number of decimal places expected
-     * @param {('UP'|'DOWN'|'HALF_UP'|'HALF_ODD'|'HALF_DOWN'|'HALF_EVEN'|'HALF_TOWARDS_ZERO'|'HALF_AWAY_FROM_ZERO')} [mode='HALF_AWAY_FROM_ZERO'] - the type of rounding strategy
+     * @param {Boolean} [prettier=true] - Flag to display human-readable (comma-separated) format
+     * @param {Number} [precision=PRECISION] - The number of decimal places to display
+     * @param {String} [rounding='HALF_AWAY_FROM_ZERO'] - The rounding strategy
      *
-     * @return {Number}
+     * @return {String}
      */
-    roundOff(precision = this.#precision, mode) {
-        return compute.rounding(this.#amount, precision, mode);
+    format(prettier = true, precision = PRECISION, rounding = 'HALF_AWAY_FROM_ZERO') {
+        const rounded = compute.rounding(this.#amount, precision, rounding);
+
+        let output;
+        if (prettier === true) {
+            try {
+                output = rounded.toString().replace(COMMA_SEPARATOR_REGEX.NEGATIVE_LOOKBEHIND, ',');
+            } catch (error) {
+                output = rounded.toString().replace(COMMA_SEPARATOR_REGEX.LOOKAHEAD_ASSRTIONS, ',');
+            }
+        }
+
+        return output;
     }
 
     /**
@@ -76,9 +91,7 @@ class Cowrie {
      * @return {Cowrie}
      */
     plus(...addends) {
-        const summand = validate.float(this.#amount)
-            ? parseFloat(this.#amount)
-            : parseInt(this.#amount);
+        const summand = this.amount;
 
         const result = addends.every((x) => validate.integer(x)) && addends.reduce((sum, x) => {
             return compute.addition(sum, x);
@@ -87,8 +100,8 @@ class Cowrie {
         if (result === false) throw SummationTypeError;
 
         return new Cowrie({
-            currency: this.#currency,
             amount: result,
+            currency: this.#currency,
             precision: this.#precision,
         });
     }
@@ -103,9 +116,7 @@ class Cowrie {
      * @return {Cowrie}
      */
     minus(...subtrahends) {
-        const minuend = validate.float(this.#amount)
-            ? parseFloat(this.#amount)
-            : parseInt(this.#amount);
+        const minuend = this.amount;
 
         const result = subtrahends.every((x) => validate.integer(x)) && subtrahends.reduce((difference, x) => {
             return compute.subtraction(difference, x);
@@ -114,8 +125,8 @@ class Cowrie {
         if (result === false) throw SummationTypeError;
 
         return new Cowrie({
-            currency: this.#currency,
             amount: result,
+            currency: this.#currency,
             precision: this.#precision,
         });
     }
@@ -127,15 +138,11 @@ class Cowrie {
      * @return {Cowrie}
      */
     times(factor) {
-        const x = validate.float(this.#amount)
-            ? parseFloat(this.#amount)
-            : parseInt(this.#amount);
-
-        const product = compute.multiplication(x, factor);
+        const product = compute.multiplication(this.amount, factor);
 
         return new Cowrie({
-            currency: this.#currency,
             amount: product,
+            currency: this.#currency,
             precision: this.#precision,
         });
     }
@@ -147,15 +154,13 @@ class Cowrie {
      * @return {Cowrie}
      */
     divide(divisor) {
-        const dividend = validate.integer(this.#amount)
-            ? parseInt(this.#amount)
-            : parseFloat(this.#amount);
+        const dividend = this.amount;
 
         const quotient = compute.divison(dividend, divisor);
 
         return new Cowrie({
-            currency: this.#currency,
             amount: quotient,
+            currency: this.#currency,
             precision: this.#precision,
         });
     }
@@ -170,16 +175,12 @@ class Cowrie {
     allocate(ratio, precision) {
         if (!validate.ratio(ratio)) throw RatioTypeError;
 
-        const whole = validate.integer(this.#amount)
-            ? parseInt(this.#amount)
-            : parseFloat(this.#amount);
-
-        const allocations = compute.allocation(whole, ratio, precision);
+        const allocations = compute.allocation(this.amount, ratio, precision);
 
         return allocations.map((x) => {
             return new Cowrie({
-                currency: this.#currency,
                 amount: x,
+                currency: this.#currency,
                 precision: this.#precision,
             });
         });
