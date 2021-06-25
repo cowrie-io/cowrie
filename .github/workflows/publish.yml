@@ -1,0 +1,47 @@
+name: Release Pipeline
+
+on:
+    release:
+        types: [created]
+
+jobs:
+    test:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2
+            - uses: actions/setup-node@v1
+              with:
+                  node-version: 12
+            - run: npm ci
+            - run: npm test
+
+    publish-npm:
+        needs: test
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2
+            - uses: actions/setup-node@v1
+              with:
+                  node-version: 14
+                  registry-url: https://registry.npmjs.org/
+                  scope: "@cowrie"
+            - run: npm ci
+            - run: npm publish --access public
+              env:
+                  NODE_AUTH_TOKEN: ${{secrets.PUBLISH_TO_NPM_TOKEN}}
+
+    publish-github:
+        needs: test
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2
+            - uses: actions/setup-node@v1
+              with:
+                  node-version: 14
+                  registry-url: https://npm.pkg.github.com/
+                  scope: "@cowrie-io"
+            - run: npm ci
+            - run: "node -p 'const pkg = require(`./package.json`); const data = {...pkg, name: `@cowrie-io/cowrie`, publishConfig: {registry: `https://npm.pkg.github.com/`}}; require(`fs`).writeFileSync(`./package.json`, JSON.stringify(data));'"
+            - run: npm publish
+              env:
+                  NODE_AUTH_TOKEN: ${{secrets.PUBLISH_TO_GITHUB_PACKAGES_TOKEN}}
