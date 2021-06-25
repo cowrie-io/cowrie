@@ -1,56 +1,52 @@
 {
-    "name": "@cowrie/cowrie",
-    "version": "1.1.2",
-    "license": "MIT",
-    "description": "Cowrie is a JavaScript utility that allows you to add, subtract, multiply, divide, sort & partition monetary values",
-    "homepage": "https://github.com/cowrie-io/cowrie#readme",
-    "bugs": {
-        "url": "https://github.com/cowrie-io/cowrie/issues",
-        "email": "howardmnengwa@gmail.com"
-    },
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/cowrie-io/cowrie"
-    },
-    "engine": {
-        "node": ">= 0.11"
-    },
-    "main": "dist/index.js",
-    "module": "src/index.js",
-    "scripts": {
-        "test": "jest",
-        "test:debug": "jest --watch",
-        "lint": "eslint src/**/*.js",
-        "prepublishOnly": "npm run build",
-        "build": "webpack --config build/webpack.prod.js",
-        "debug": "webpack-dev-server --config build/webpack.dev.js"
-    },
-    "keywords": [
-        "currency",
-        "money",
-        "cowry",
-        "cowrie",
-        "JavaScript"
-    ],
-    "author": "Howard Mnengwa <howardmnengwa@gmail.com> (https://mnengwa.github.com/)",
-    "contributors": [
-        "Dennis Mwangangi <mwangangi@creareafrica.com> (https://github.com/mwangangi)"
-    ],
-    "devDependencies": {
-        "@babel/core": "^7.10.4",
-        "@babel/plugin-proposal-class-properties": "^7.10.4",
-        "@babel/preset-env": "^7.10.4",
-        "babel-eslint": "^10.1.0",
-        "babel-jest": "^26.1.0",
-        "babel-loader": "^8.1.0",
-        "babel-plugin-transform-es2015-modules-commonjs": "^6.26.2",
-        "clean-webpack-plugin": "^3.0.0",
-        "eslint": "^7.4.0",
-        "eslint-config-google": "^0.14.0",
-        "jest": "^26.1.0",
-        "webpack": "^4.43.0",
-        "webpack-cli": "^3.3.12",
-        "webpack-dev-server": "^3.11.0",
-        "webpack-merge": "^5.0.3"
-    }
+  "name": "@cowrie/cowrie",
+  "version": "2.0.0",
+  "description": "Cowrie is a JavaScript utility that accurately perform arithmetics, format & convert monetary values",
+  "main": "dist/index.js",
+  "module": "src/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shilingi/cowrie.git"
+  },
+  "author": "Howard Mnengwa <howardmnengwa@gmail.com> (https://mnengwa.github.com/)",
+  "contributors": [
+    "Dennis Mwangangi <mwangangi@creareafrica.com> (https://github.com/mwangangi)"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/shilingi/cowrie/issues"
+  },
+  "homepage": "https://github.com/shilingi/cowrie#readme",
+  "keywords": [
+    "currency",
+    "money",
+    "cowry",
+    "cowrie",
+    "JavaScript"
+  ],
+  "scripts": {
+    "test": "jest",
+    "lint": "eslint src/**/*.js",
+    "test:debug": "jest --watchAll --verbose",
+    "prepublishOnly": "npm run build",
+    "build": "webpack --config build/webpack.prod.js",
+    "debug": "webpack server --config build/webpack.dev.js --progress"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@babel/core": "^7.14.6",
+    "@babel/plugin-proposal-class-properties": "^7.14.5",
+    "@babel/preset-env": "^7.14.7",
+    "@types/jest": "^26.0.23",
+    "babel-eslint": "^10.1.0",
+    "babel-loader": "^8.2.2",
+    "clean-webpack-plugin": "^4.0.0-alpha.0",
+    "eslint": "^7.29.0",
+    "eslint-config-google": "^0.14.0",
+    "jest": "^27.0.5",
+    "webpack": "^5.40.0",
+    "webpack-cli": "^4.7.2",
+    "webpack-dev-server": "^3.11.2",
+    "webpack-merge": "^5.8.0"
+  }
 }

@@ -1,9 +1,0 @@
-{
-    "bail": true,
-    "verbose": true,
-    "collectCoverage": true,
-    "moduleNameMapper": {
-        "^@/(.*)$": "<rootDir>/src/$1"
-    },
-    "coverageReporters": ["json", "html"]
-}

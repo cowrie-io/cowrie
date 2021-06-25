@@ -1,28 +1,15 @@
 {
-    "presets": [
-        [
-            "@babel/preset-env",
-            {
-                "targets": {
-                    "node": true,
-                    "browsers": [
-                        "> 1%",
-                        "not dead",
-                        "Firefox ESR",
-                        "last 2 versions"
-                    ]
-                }
-            }
-        ]
-    ],
-    "env": {
-        "test": {
-            "plugins": [
-                "transform-es2015-modules-commonjs"
-            ]
-        }
-    },
-    "plugins": [
-        "@babel/plugin-proposal-class-properties"
-    ]
+  "presets": [
+    "@babel/preset-env"
+  ],
+  "env": {
+    "test": {
+      "plugins": [
+        "transform-es2015-modules-commonjs"
+      ]
+    }
+  },
+  "plugins": [
+    "@babel/plugin-proposal-class-properties"
+  ]
 }
